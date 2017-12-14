@@ -1,0 +1,88 @@
+
+<canvas id="z_l" width="240" height="240" style="border: 1px solid black"></canvas>
+<script>
+
+var can = document.getElementById("z_l");
+var ctx = can.getContext("2d");
+function Line(x1, y1, x2,y2){
+    this.start_x = x1;
+    this.start_y = y1;
+    this.end_x = x2;
+    this.end_y = y2;
+    this.draw_line = function(){
+        var x0 = this.start_x, y0 = this.start_y, x1=this.end_x, y1=this.end_y;
+        var steep = Math.abs(this.end_y - this.start_y) > Math.abs(this.end_x - this.start_x);
+        if (steep)
+        {
+            [y0, x0] = [x0, y0];
+            [y1, x1] = [x1, y1];
+        }
+        if (x0 > x1)
+        {
+            [x0, x1] = [x1, x0];
+            [y0, y1] = [y1,y0];
+        }
+        var dx = x1 - x0;
+        var dy = Math.abs(y1 - y0);
+        var error = dx / 2;
+        var ystep = (y0 < y1) ? 1 : -1;
+        var y = y0;
+        for (var x = x0; x <= x1; x++)
+        {
+            ctx.fillRect(steep ? y : x, steep ? x : y, 1, 1);
+            error -= dy;
+            if (error < 0)
+            {
+                y += ystep;
+                error += dx;
+            }
+        }
+    }
+}
+
+function Dot(x, y){
+    this.x = x;
+    this.y = y;
+}
+function Polygon() {
+    this.dots = []
+    this.lines = [];
+    this.draw = function () {
+        for (var i = 1; i < this.dots.length; i++) {
+            this.lines.push(new Line(this.dots[i - 1].x, this.dots[i - 1].y, this.dots[i].x, this.dots[i].y));
+            this.lines[this.lines.length-1].draw_line();
+        }
+        this.lines.push(new Line(this.dots[this.dots.length - 1].x, this.dots[this.dots.length - 1].y, this.dots[0].x, this.dots[0].y));
+        this.lines[this.lines.length-1].draw_line();
+    }
+}
+var p = new Polygon();
+p.dots.push(new Dot(30, 200), new Dot(30, 30), new Dot(100, 50), new Dot(150, 50), new Dot(210, 180), new Dot(130, 120));
+p.draw();
+
+function fill_level(polygon, level){
+    var cross = [];
+    for(var i = 0; i < can.width; i++){
+        var color = ctx.getImageData(i, level, 1, 1).data;
+        if(color[3]){
+            console.log(level + " " + i);
+            if(cross[cross.length-1] != i-1){
+                cross.push(i);
+                for (var j = 0; j < polygon.dots.length; j++) {
+                    if (level == polygon.dots[j].y && i == polygon.dots[j].x) cross.push(i);
+                }
+            }
+        }
+    }
+    for(var i = 1; i < cross.length; i+=2) {
+        var line = new Line(cross[i-1], level, cross[i], level);
+        line.draw_line();
+    }
+}
+
+function fill(polygon){
+    for (var i = 0; i < can.height; i++) fill_level(polygon, i);
+}
+
+fill(p);
+</script>

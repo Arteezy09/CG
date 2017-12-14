@@ -1,0 +1,164 @@
+<html>
+<body>
+
+<table>
+	<tr><td>Text to Save:</td></tr>
+	<tr>
+		<td colspan="3">
+			<textarea id="inputTextToSave" style="width:512px;height:256px"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td>Filename to Save As:</td>
+		<td><input id="inputFileNameToSaveAs"></input></td>
+        <td><button onclick="drawPic()">Draw Picture</button></td>
+        <td><button onclick="savePicToFile()">Save Pic to File</button></td>
+	</tr>
+	<tr>
+		<td>Select a File to Load:</td>
+		<td><input type="file" id="fileToLoad"></td>
+		<td><button onclick="loadFileAsText()">Load Selected File</button><td>
+	</tr>
+    <tr>
+        <td>
+    <canvas id='lab02' height='100' width='100' style='border:1px solid;'>
+    </canvas>
+        </td>      
+    </tr>
+</table>
+
+<script type='text/javascript'>
+var flag = 0;
+                        
+var canvas = document.getElementById('lab02');
+                        
+var ctx = canvas.getContext('2d');
+                        
+canvas.addEventListener('click', onClick);      
+                        
+canvas.addEventListener('mousedown',MouseDown);
+                        
+canvas.addEventListener('mousemove',MouseMove);
+                        
+canvas.addEventListener('mouseup',MouseUp);
+                      
+function onClick(event) 
+{
+                  
+           ctx.fillRect(event.offsetX,event.offsetY,1,1);
+                
+}
+                
+function MouseMove(event) 
+{
+                  
+           if (flag == 1) ctx.fillRect(event.offsetX,event.offsetY,1,1);
+                
+}
+                
+function MouseDown(event) 
+{
+                 
+           flag = 1;
+                     
+           ctx.fillRect(event.offsetX,event.offsetY,1,1);
+                
+}
+                 
+function MouseUp(event) 
+{
+                  
+           ctx.fillRect(event.offsetX,event.offsetY,1,1);
+                  
+           flag = 0;
+
+}
+                 
+function drawPic()
+{
+	var textfromtextarea = document.getElementById("inputTextToSave").value;
+	alert('work');
+	var canvas = document.getElementById('lab02');   
+    var ctx = canvas.getContext('2d');	
+	for (i=0; i<100; i++){
+          for (j=0; j<100; j++)
+          {
+             if (textfromtextarea[i*100+j] == 1){
+              ctx.fillRect(j,i,1,1);
+              }
+          }
+       }
+
+}
+
+function savePicToFile()
+{
+    var canvas = document.getElementById('lab02');   
+    var ctx = canvas.getContext('2d');
+    var res = "";      
+    for (i=0;i<canvas.height; i++)
+    {    
+        for (j=0;j<canvas.width; j++)
+        {
+                var pixelinfo = ctx.getImageData(j,i,1,1);              
+                if (pixelinfo.data[3] === 255)
+                    {res+="1";}
+                else
+                    {res+="0";}                  
+         }
+    }
+    var texttoWrite = document.getElementById("inputTextToSave");
+    texttoWrite.value = res;
+       
+    var textFileAsBlob = new Blob([res], {type:'text/plain'});
+    var fileNameToSaveAs = document.getElementById("inputFileNameToSaveAs").value;
+    
+	var downloadLink = document.createElement("a");
+	downloadLink.download = fileNameToSaveAs;
+	downloadLink.innerHTML = "Download File";
+	if (window.webkitURL != null)
+	    {
+		    
+		    downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+	    }
+	    else
+	    {
+		    
+		    downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+		    downloadLink.onclick = destroyClickedElement;
+		    downloadLink.style.display = "none";
+		    document.body.appendChild(downloadLink);
+	    }
+	downloadLink.click();              
+}
+
+function destroyClickedElement(event)
+{
+	document.body.removeChild(event.target);
+}
+function loadFileAsText()
+{
+	var fileToLoad = document.getElementById("fileToLoad").files[0];
+	var fileReader = new FileReader();
+    var canvas = document.getElementById('lab02');   
+    var ctx = canvas.getContext('2d');	
+    fileReader.onload = function(fileLoadedEvent) 
+	{
+		var textFromFileLoaded = fileLoadedEvent.target.result;
+		document.getElementById("inputTextToSave").value = textFromFileLoaded;
+        
+        for (i=0; i<100; i++){
+          for (j=0; j<100; j++)
+          {
+             if (textFromFileLoaded[i*100+j] == 1){
+              ctx.fillRect(j,i,1,1);
+              }
+          }
+       }
+	};
+	fileReader.readAsText(fileToLoad, "UTF-8");
+}
+</script>
+
+</body>
+</html>

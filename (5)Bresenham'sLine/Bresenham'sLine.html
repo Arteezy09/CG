@@ -1,0 +1,57 @@
+<canvas id="lab" height="400" width="400" style="border: 2px solid; background:#eeeeee"></canvas>
+
+<script>
+var canv = document.getElementById("lab");
+var ctx = canv.getContext("2d");
+
+var x1,y1,x2,y2;
+var flag=0;
+
+canv.addEventListener("click", onClick);
+
+function onClick(event) {
+	if (flag == 0) {
+		x1 = event.offsetX;
+        y1 = event.offsetY;
+        flag = 1;
+        return;
+    }
+    if (flag == 1) {      
+		x2 = event.offsetX;
+        y2 = event.offsetY;
+        drawLine(x1,y1,x2,y2);
+        flag = 0;
+        return;
+    }
+}
+  
+function drawLine(x1,y1,x2,y2) {
+	var deltaX = Math.abs(x2 - x1);
+    var deltaY = Math.abs(y2 - y1);
+    var signX = x1 < x2 ? 1 : -1;
+    var signY = y1 < y2 ? 1 : -1;
+    var error = deltaX - deltaY;
+    ctx.fillRect(x2,y2,1,1);
+    while((x1 != x2) || (y1 != y2)) {       
+        ctx.fillRect(x1,y1,1,1);
+        var error2 = error * 2;
+        
+        if(error2 > -deltaY) {
+            error -= deltaY;
+            x1 += signX;
+        }
+        if(error2 < deltaX) {
+            error += deltaX;
+            y1 += signY;
+        }  
+    }
+}
+</script>
+
+
+
+      
+           
+
+
+

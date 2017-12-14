@@ -1,0 +1,40 @@
+<canvas id="lab" height="400" width="400" style="border: 2px solid; background:#eeeeee"></canvas>
+
+<script>
+var canv = document.getElementById("lab");
+var ctx = canv.getContext("2d");
+
+ctx.fillStyle = "black";
+
+function drawPixel(x, y) {
+  ctx.fillRect(x, y, 1, 1);
+}
+
+function drawCirle(x0, y0, radius) {
+	var r = radius;
+    var y = 0;
+    var radiusError = 1 - r;
+  
+    while (r >= y) {
+		drawPixel(r + x0, y + y0);
+		drawPixel(y + x0, r + y0);
+		drawPixel(-r + x0, y + y0);
+		drawPixel(-y + x0, r + y0);
+		drawPixel(-r + x0, -y + y0);
+		drawPixel(-y + x0, -r + y0);
+		drawPixel(r + x0, -y + y0);
+		drawPixel(y + x0, -r + y0);
+		y++;
+    
+		if (radiusError < 0) {
+		radiusError += 2 * y + 1;
+		}
+		else {
+			r--;
+			radiusError+= 2 * (y - r + 1);
+		}
+    }
+}
+drawCirle(200, 200, 180); drawCirle(200, 200, 130);
+drawCirle(200, 200, 80);  drawCirle(200, 200, 30);
+</script>

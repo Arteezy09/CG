@@ -1,0 +1,205 @@
+<!DOCTYPE>
+<html>
+    <body>
+        <canvas id = "cg" height = "1000" width = "1000" style= "border:1px solid"></canvas>
+
+        <script>
+            function myLine(xB, yB, xE, yE)
+            {
+                var d_x = /*Math.abs*/(xE-xB);
+                var d_y = /*Math.abs*/(yE-yB);
+                var tg = (d_y/d_x);
+                if((tg>=0)&&(tg<=1))
+                {
+                    var er =0;
+                    var d_er = d_y;
+                    var y=yB;
+                    if(xB<=xE){
+                        for(x=xB; x<=xE; ++x)
+                        {
+                            ctx.fillRect(x,y,1,1);
+                            er+=d_er;
+                            if((2*er)>=d_x)
+                            {
+                                y+=1;
+                                er-=d_x;
+                            }
+                        } 
+                    }
+                    else
+                    {
+                        for(x=xB; x>=xE; --x)
+                        {
+                            ctx.fillRect(x,y,1,1);
+                            er+=d_er;
+                            if((2*er)<=d_x)
+                            {
+                                y-=1;
+                                er-=d_x;
+                            }
+                        } 
+                    }
+                }
+                if(tg>1)
+                {
+                    var er =0;
+                    var d_er = d_x;
+                    var x=xB;
+                    if(xB<=xE)
+                    {
+                        for(y=yB; y<=yE; ++y)
+                        {
+                            ctx.fillRect(x,y,1,1);
+                            er+=d_er;
+                            if((2*er)>=d_y)
+                            {
+                               x+=1;
+                              er-=d_y;
+                            }
+                        } 
+                    }
+                    else
+                    {
+                        for(y=yB; y>=yE; --y)
+                        {
+                            ctx.fillRect(x,y,1,1);
+                            er+=d_er;
+                            if((2*er)<=d_y)
+                            {
+                                x-=1;
+                                er-=d_y;
+                            }
+                        } 
+                    }
+                }
+                if((tg<0)&&(tg>=-1))
+                {                    
+					var er =0;
+                    var d_er = -d_y;
+                    var y=yB;
+                    if(xB<=xE)
+                    {
+                        for(x=xB; x<=xE; ++x)
+                        {
+                            ctx.fillRect(x,y,1,1);
+                            er+=d_er;
+                            if((2*er)>=d_x)
+                            {
+                                y-=1;
+                                er-=d_x;
+                            }
+                        } 
+                    }
+                    else
+                    {
+                        for(x=xB; x>=xE; --x)
+                        {
+                            ctx.fillRect(x,y,1,1);
+                            er+=d_er;
+                            if((2*er)<=(d_x))
+                            {
+                                y+=1;
+                                er-=d_x;
+                            }
+                        } 
+                    }
+                }
+                if(tg<-1)
+                {
+                    var er =0;
+                    var d_er = d_x;
+                    var x=xB;
+                    if(xB<=xE)
+                    {
+                        for(y=yB; y>=yE; --y)
+                        {
+                            ctx.fillRect(x,y,1,1);
+                            er+=d_er;
+                            if((2*er)>=(-d_y))
+                            {
+                                x+=1;
+                                er+=d_y;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for(y=yB; y<=yE; ++y)
+                        {
+                            ctx.fillRect(x,y,1,1);
+                            er+=d_er;
+                            if((2*er)<=(-d_y))
+                            {
+                                x-=1;
+                                er+=d_y;
+                            }
+                        }
+                    }
+                }
+            }
+
+            function f(event)
+            {
+                if(i==1)
+                {
+                    xE=event.offsetX;
+                    yE=event.offsetY;
+                    xF = xE;
+                    yF = yE;
+                    ++i;
+                    //ctx.beginPath();
+                    //ctx.moveTo(xE, yE);
+                }
+                else
+                {
+                    xB = xE;
+                    yB = yE;
+                    xE=event.offsetX;
+                    yE=event.offsetY;
+                    ++i;
+                    myLine(xB, yB, xE, yE);
+                    //ctx.lineTo(xE, yE);
+                    if (i == n+1) 
+                    {
+                        myLine(xE, yE, xF, yF);
+                       //ctx.lineTo(xF, yF);
+                       //ctx.stroke();
+                       can.removeEventListener('click', f);
+                       can.addEventListener('click', f_);
+                     }
+                }
+            }
+
+            function zapolnenie(a, b)
+            {
+                ctx.fillRect(a, b, 1, 1);
+                var im1 = ctx.getImageData(a, b-1, 1, 1).data;
+                if(! im1[3]) zapolnenie(a, b-1);
+                im1 = ctx.getImageData(a+1, b, 1, 1).data;
+                if(! im1[3]) zapolnenie(a+1, b);
+                im1 = ctx.getImageData(a, b+1, 1, 1).data;
+                if(! im1[3]) zapolnenie(a, b+1);
+                im1 = ctx.getImageData(a-1, b, 1, 1).data;
+                if(! im1[3]) zapolnenie(a-1, b);
+            }
+
+            function f_(event)
+            {
+                var x_ = event.offsetX;
+                var y_ = event.offsetY;
+                zapolnenie(x_, y_);
+                can.removeEventListener('click', f_);
+            }
+
+        </script>
+
+        <script>
+            var can = document.getElementById("cg");
+            var ctx = can.getContext("2d");
+            var n = parseInt(prompt("Enter the number of vertices"));
+            var xB=0, yB=0; xE=0; yE=0, xF=0, yF = 0;
+            var i =1;
+            can.addEventListener('click', f);
+        </script>
+    </body>
+</html>
